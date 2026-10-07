@@ -1,0 +1,18 @@
+# Netlify / Cloudflare Pages — only used if Airsoft Texas signs and the site migrates.
+# [CURRENT NAV HREFS — ENUMERATE EXACT PATHS, CONFIRM] — check every path against airsofttx.com first.
+
+# The two dead nav links (HTTP 404 today) must RESOLVE at the paths the nav already points at.
+# 200 = rewrite: the old URL stays in the address bar and starts working instead of moving.
+/prices-and-hours      /prices-hours.html     200
+/prices-and-hours/     /prices-hours.html     200
+/rules                 /rules.html            200
+/rules/                /rules.html            200
+
+# Working pages today — keep them alive (paths assumed from nav labels, confirm)
+/atx-superstore        /superstore.html       200
+/about                 /about.html            200
+/contact               /contact.html          200
+/waivers               /waivers.html          200
+/photo-gallery         /gallery.html          200
+
+# Waiver PDF: copy the current file across at its existing path at migration. [PDF PATH — CONFIRM]
