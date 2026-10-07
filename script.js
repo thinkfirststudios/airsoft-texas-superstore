@@ -38,14 +38,37 @@
   var hero = document.querySelector(".hero");
   if (hero) requestAnimationFrame(function () { hero.classList.add("is-in"); });
 
+  /* .rv starts fully clipped (clip-path wipe), and a fully clipped element never reports as
+     intersecting — so observe its unclipped parent and reveal the .rv children from there. */
   var targets = document.querySelectorAll(".rv, .rv-stagger");
   if (reduce || !("IntersectionObserver" in window)) {
     targets.forEach(function (el) { el.classList.add("on"); });
   } else {
+    var groups = new Map();
+    targets.forEach(function (el) {
+      var key = el.classList.contains("rv") ? el.parentElement : el;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(el);
+    });
     var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add("on"); io.unobserve(en.target); } });
-    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
-    targets.forEach(function (el) { io.observe(el); });
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        (groups.get(en.target) || []).forEach(function (el) { el.classList.add("on"); });
+        io.unobserve(en.target);
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0 });
+    groups.forEach(function (_, key) { io.observe(key); });
+    /* Safety net: anything on screen that is still hidden gets revealed — content never stays blank */
+    var net = setInterval(function () {
+      var left = 0;
+      targets.forEach(function (el) {
+        if (el.classList.contains("on")) return;
+        left++;
+        var r = el.parentElement.getBoundingClientRect();
+        if (r.top < window.innerHeight && r.bottom > 0) el.classList.add("on");
+      });
+      if (!left) clearInterval(net);
+    }, 800);
   }
 
   /* Count-up — ONLY on verified published figures ($25, 9, 5, 10, age 10, 3 options) */
